@@ -274,7 +274,7 @@ const FarmerDashboard = ({ user, onLogout, onViewProfile }) => {
             <div className="flex flex-col gap-4">
               <input
                 type="text"
-                placeholder="Crop Name (e.g. Wheat, Tomato)"
+                placeholder={t('cropName')}
                 className="border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-green-400"
                 value={form.name}
                 onChange={(e) => setForm({ ...form, name: e.target.value })}
@@ -317,7 +317,7 @@ const FarmerDashboard = ({ user, onLogout, onViewProfile }) => {
               />
               <input
                 type="text"
-                placeholder="Farm Location (e.g. Ludhiana, Punjab)"
+                placeholder={t('location')}
                 className="border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-green-400"
                 value={form.location}
                 onChange={(e) => setForm({ ...form, location: e.target.value })}
