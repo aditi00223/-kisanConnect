@@ -8,14 +8,15 @@ import OrderPage from './pages/OrderPage';
 import DemandChart from './pages/DemandChart';
 import FarmerProfile from './pages/FarmerProfile';
 import ProtectedRoute from './components/ProtectedRoute';
+import { useAuth } from './context/AuthContext';
 
 function AppRoutes() {
-  const [user, setUser] = useState(null);
+  const { user, login, logout } = useAuth();
   const [selectedCrop, setSelectedCrop] = useState(null);
   const navigate = useNavigate();
 
   const handleLogin = (userData) => {
-    setUser(userData);
+    login(userData);
     if (userData.role === 'farmer') {
       navigate('/farmer');
     } else {
@@ -24,7 +25,7 @@ function AppRoutes() {
   };
 
   const handleLogout = () => {
-    setUser(null);
+    logout();
     navigate('/');
   };
 
