@@ -1,124 +1,77 @@
-import React, { useState } from 'react';
-
-const crops = [
-  { id: 1, crop: 'Wheat', farmer: 'Harjeet Singh', location: 'Ludhiana, Punjab', quantity: '10 Quintal', price: 2200, rating: 4.5 },
-  { id: 2, crop: 'Wheat', farmer: 'Balwinder Kumar', location: 'Amritsar, Punjab', quantity: '5 Quintal', price: 2050, rating: 4.2 },
-  { id: 3, crop: 'Wheat', farmer: 'Sukhdev Yadav', location: 'Karnal, Haryana', quantity: '8 Quintal', price: 2300, rating: 4.8 },
-  { id: 4, crop: 'Tomato', farmer: 'Ramesh Patel', location: 'Agra, UP', quantity: '3 Quintal', price: 800, rating: 4.0 },
-  { id: 5, crop: 'Tomato', farmer: 'Suresh Verma', location: 'Mathura, UP', quantity: '6 Quintal', price: 750, rating: 4.3 },
-  { id: 6, crop: 'Rice', farmer: 'Gurpreet Singh', location: 'Patiala, Punjab', quantity: '15 Quintal', price: 3200, rating: 4.6 },
-  { id: 7, crop: 'Rice', farmer: 'Mohan Lal', location: 'Ambala, Haryana', quantity: '10 Quintal', price: 3100, rating: 4.1 },
-];
+import React, { useState, useEffect } from 'react';
+import api from '../api';
 
 const BuyerMarketplace = ({ user, onLogout, onOrder, onViewChart }) => {
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState('All');
+  const [crops, setCrops] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   const categories = ['All', 'Wheat', 'Tomato', 'Rice'];
+
+  useEffect(() => {
+    const fetchCrops = async () => {
+      try {
+        const res = await api.get('/products');
+        setCrops(res.data);
+      } catch (err) {
+        console.error('Failed to fetch crops:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchCrops();
+  }, []);
 
   const filtered = crops.filter((c) => {
     const matchCategory = category === 'All' || c.crop === category;
     const matchSearch = c.crop.toLowerCase().includes(search.toLowerCase()) ||
-      c.farmer.toLowerCase().includes(search.toLowerCase()) ||
-      c.location.toLowerCase().includes(search.toLowerCase());
+      c.farmer?.toLowerCase().includes(search.toLowerCase());
     return matchCategory && matchSearch;
   });
 
-  const cheapest = {};
-  crops.forEach((c) => {
-    if (!cheapest[c.crop] || c.price < cheapest[c.crop]) {
-      cheapest[c.crop] = c.price;
-    }
-  });
+  if (loading) return <div className="text-center p-10">Loading crops...</div>;
 
   return (
-    <div className="min-h-screen bg-[#fafaf9]">
-
-      {/* Navbar */}
-      <nav className="bg-white shadow-sm px-6 py-4 flex justify-between items-center">
-        <div className="flex items-center gap-2">
-          <span className="text-2xl">🌾</span>
-          <span className="text-xl font-bold text-green-700">KisanConnect</span>
+    <div className="min-h-screen bg-gray-50 p-4">
+      <div className="max-w-5xl mx-auto">
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-2xl font-bold text-green-700">Buyer Marketplace</h1>
+          <button onClick={onLogout} className="text-sm text-red-500">Logout</button>
         </div>
-        <div className="flex items-center gap-3">
-          <button
-            onClick={onViewChart}
-            className="text-sm bg-green-50 text-green-700 px-3 py-1 rounded-lg border border-green-200"
-          >
-            📈 Price Trends
-          </button>
-          <span className="text-sm text-gray-500">🛒 {user?.email}</span>
-          <button
-            onClick={onLogout}
-            className="text-sm bg-red-50 text-red-500 px-3 py-1 rounded-lg border border-red-200"
-          >
-            Logout
-          </button>
-        </div>
-      </nav>
-
-      {/* Header */}
-      <div className="bg-green-700 text-white px-6 py-6">
-        <h1 className="text-2xl font-bold">Buyer Marketplace 🛒</h1>
-        <p className="text-green-200 text-sm mt-1">Compare prices directly from farmers</p>
-      </div>
-
-      {/* Search + Filter */}
-      <div className="px-6 py-4 bg-white border-b border-gray-100">
-        <input
-          type="text"
-          placeholder="🔍 Search crop, farmer or location..."
-          className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-green-400 mb-3"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-        />
-        <div className="flex gap-2 flex-wrap">
-          {categories.map((cat) => (
-            <button
-              key={cat}
-              onClick={() => setCategory(cat)}
-              className={`px-4 py-1 rounded-full text-sm font-medium border transition-all ${
-                category === cat
-                  ? 'bg-green-600 text-white border-green-600'
-                  : 'text-green-700 border-green-300'
-              }`}
-            >
+        <input className="w-full border rounded-lg px-4 py-2 mb-4"
+          placeholder="Search crop or farmer..."
+          value={search} onChange={e => setSearch(e.target.value)} />
+        <div className="flex gap-2 mb-4">
+          {categories.map(cat => (
+            <button key={cat} onClick={() => setCategory(cat)}
+              className={`px-4 py-1 rounded-full text-sm ${category === cat ? 'bg-green-600 text-white' : 'bg-white border'}`}>
               {cat}
             </button>
           ))}
         </div>
-      </div>
-
-      {/* Listings */}
-      <div className="px-6 py-6 max-w-5xl mx-auto">
-        <p className="text-sm text-gray-500 mb-4">{filtered.length} listings found</p>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {filtered.map((item) => (
-            <div key={item.id} className="bg-white rounded-2xl shadow p-5 border border-gray-100 relative">
-              {item.price === cheapest[item.crop] && (
-                <span className="absolute top-3 right-3 bg-orange-100 text-orange-600 text-xs font-bold px-2 py-1 rounded-full">
-                  🏷️ Cheapest
-                </span>
-              )}
-              <h3 className="font-bold text-gray-800 text-lg">🌾 {item.crop}</h3>
-              <p className="text-sm text-gray-500 mt-1">👨‍🌾 {item.farmer}</p>
-              <p className="text-sm text-gray-500">📍 {item.location}</p>
-              <p className="text-sm text-gray-500">📦 {item.quantity}</p>
-              <div className="flex justify-between items-center mt-3">
-                <p className="text-green-600 font-bold text-lg">₹{item.price}/q</p>
-                <p className="text-yellow-500 text-sm">⭐ {item.rating}</p>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {filtered.map(crop => (
+            <div key={crop._id || crop.id} className="bg-white rounded-xl shadow p-4">
+              <h2 className="text-lg font-bold text-green-700">{crop.crop}</h2>
+              <p className="text-sm text-gray-500">Farmer: {crop.farmer}</p>
+              <p className="text-sm text-gray-500">Location: {crop.location}</p>
+              <p className="text-sm text-gray-500">Quantity: {crop.quantity}</p>
+              <p className="text-lg font-bold text-green-600 mt-2">₹{crop.price}/quintal</p>
+              <div className="flex gap-2 mt-3">
+                <button onClick={() => onOrder(crop)}
+                  className="flex-1 bg-green-600 text-white py-1 rounded-lg text-sm">
+                  Order
+                </button>
+                <button onClick={() => onViewChart(crop.crop)}
+                  className="flex-1 border border-green-600 text-green-600 py-1 rounded-lg text-sm">
+                  Price Trend
+                </button>
               </div>
-              <button
-                onClick={() => onOrder(item)}
-                className="w-full mt-3 bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 rounded-xl text-sm"
-              >
-                Place Order
-              </button>
             </div>
           ))}
         </div>
       </div>
-
     </div>
   );
 };
