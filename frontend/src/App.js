@@ -4,6 +4,7 @@ import AuthPage from './pages/AuthPage';
 import FarmerDashboard from './pages/FarmerDashboard';
 import BuyerMarketplace from './pages/BuyerMarketplace';
 import OrderPage from './pages/OrderPage';
+import DemandChart from './pages/DemandChart';
 
 function App() {
   const [page, setPage] = useState('landing');
@@ -41,7 +42,12 @@ function App() {
         <FarmerDashboard user={user} onLogout={handleLogout} />
       )}
       {page === 'buyerMarketplace' && (
-        <BuyerMarketplace user={user} onLogout={handleLogout} onOrder={handleOrder} />
+        <BuyerMarketplace
+          user={user}
+          onLogout={handleLogout}
+          onOrder={handleOrder}
+          onViewChart={() => setPage('demandChart')}
+        />
       )}
       {page === 'orderPage' && (
         <OrderPage
@@ -50,6 +56,9 @@ function App() {
           onBack={() => setPage('buyerMarketplace')}
           onOrderPlaced={() => setPage('buyerMarketplace')}
         />
+      )}
+      {page === 'demandChart' && (
+        <DemandChart onBack={() => setPage('buyerMarketplace')} />
       )}
     </div>
   );
