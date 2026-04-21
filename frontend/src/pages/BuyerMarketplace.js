@@ -1,33 +1,50 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
-const crops = [
-  { id: 1, crop: 'Wheat', farmer: 'Harjeet Singh', location: 'Ludhiana, Punjab', quantity: '10 Quintal', price: 2200, rating: 4.5 },
-  { id: 2, crop: 'Wheat', farmer: 'Balwinder Kumar', location: 'Amritsar, Punjab', quantity: '5 Quintal', price: 2050, rating: 4.2 },
-  { id: 3, crop: 'Wheat', farmer: 'Sukhdev Yadav', location: 'Karnal, Haryana', quantity: '8 Quintal', price: 2300, rating: 4.8 },
-  { id: 4, crop: 'Tomato', farmer: 'Ramesh Patel', location: 'Agra, UP', quantity: '3 Quintal', price: 800, rating: 4.0 },
-  { id: 5, crop: 'Tomato', farmer: 'Suresh Verma', location: 'Mathura, UP', quantity: '6 Quintal', price: 750, rating: 4.3 },
-  { id: 6, crop: 'Rice', farmer: 'Gurpreet Singh', location: 'Patiala, Punjab', quantity: '15 Quintal', price: 3200, rating: 4.6 },
-  { id: 7, crop: 'Rice', farmer: 'Mohan Lal', location: 'Ambala, Haryana', quantity: '10 Quintal', price: 3100, rating: 4.1 },
-];
+const API = 'http://localhost:5000';
 
 const BuyerMarketplace = ({ user, onLogout, onOrder, onViewChart }) => {
+  const [products, setProducts] = useState([]);
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState('All');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
-  const categories = ['All', 'Wheat', 'Tomato', 'Rice'];
+  const token = localStorage.getItem('token');
 
-  const filtered = crops.filter((c) => {
-    const matchCategory = category === 'All' || c.crop === category;
-    const matchSearch = c.crop.toLowerCase().includes(search.toLowerCase()) ||
-      c.farmer.toLowerCase().includes(search.toLowerCase()) ||
-      c.location.toLowerCase().includes(search.toLowerCase());
-    return matchCategory && matchSearch;
+  useEffect(() => {
+    fetchProducts();
+  }, [category]);
+
+  const fetchProducts = async () => {
+    setLoading(true);
+    setError('');
+    try {
+      let url = `${API}/api/products`;
+      if (category !== 'All') url += `?category=${category}`;
+      const res = await fetch(url);
+      const data = await res.json();
+      setProducts(data.products || []);
+    } catch {
+      setError('Failed to load products. Make sure backend is running.');
+    }
+    setLoading(false);
+  };
+
+  const categories = ['All', 'Grain', 'Vegetable', 'Fruit', 'Rice'];
+
+  const filtered = products.filter((p) => {
+    const matchSearch =
+      p.name.toLowerCase().includes(search.toLowerCase()) ||
+      (p.farmer?.name || '').toLowerCase().includes(search.toLowerCase()) ||
+      p.location.toLowerCase().includes(search.toLowerCase());
+    return matchSearch;
   });
 
+  // Find cheapest price per crop name
   const cheapest = {};
-  crops.forEach((c) => {
-    if (!cheapest[c.crop] || c.price < cheapest[c.crop]) {
-      cheapest[c.crop] = c.price;
+  products.forEach((p) => {
+    if (!cheapest[p.name] || p.pricePerUnit < cheapest[p.name]) {
+      cheapest[p.name] = p.pricePerUnit;
     }
   });
 
@@ -41,15 +58,16 @@ const BuyerMarketplace = ({ user, onLogout, onOrder, onViewChart }) => {
           <span className="text-xl font-bold text-green-700">KisanConnect</span>
         </div>
         <div className="flex items-center gap-3">
+          <button onClick={onViewForum}>💬 Forum</button>
           <button
             onClick={onViewChart}
             className="text-sm bg-green-50 text-green-700 px-3 py-1 rounded-lg border border-green-200"
           >
             📈 Price Trends
           </button>
-          <span className="text-sm text-gray-500">🛒 {user?.email}</span>
+          <span className="text-sm text-gray-500 hidden sm:block">🛒 {user?.name}</span>
           <button
-            onClick={onLogout}
+            onClick={() => { localStorage.removeItem('token'); localStorage.removeItem('user'); onLogout(); }}
             className="text-sm bg-red-50 text-red-500 px-3 py-1 rounded-lg border border-red-200"
           >
             Logout
@@ -91,34 +109,58 @@ const BuyerMarketplace = ({ user, onLogout, onOrder, onViewChart }) => {
 
       {/* Listings */}
       <div className="px-6 py-6 max-w-5xl mx-auto">
-        <p className="text-sm text-gray-500 mb-4">{filtered.length} listings found</p>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {filtered.map((item) => (
-            <div key={item.id} className="bg-white rounded-2xl shadow p-5 border border-gray-100 relative">
-              {item.price === cheapest[item.crop] && (
-                <span className="absolute top-3 right-3 bg-orange-100 text-orange-600 text-xs font-bold px-2 py-1 rounded-full">
-                  🏷️ Cheapest
-                </span>
-              )}
-              <h3 className="font-bold text-gray-800 text-lg">🌾 {item.crop}</h3>
-              <p className="text-sm text-gray-500 mt-1">👨‍🌾 {item.farmer}</p>
-              <p className="text-sm text-gray-500">📍 {item.location}</p>
-              <p className="text-sm text-gray-500">📦 {item.quantity}</p>
-              <div className="flex justify-between items-center mt-3">
-                <p className="text-green-600 font-bold text-lg">₹{item.price}/q</p>
-                <p className="text-yellow-500 text-sm">⭐ {item.rating}</p>
-              </div>
-              <button
-                onClick={() => onOrder(item)}
-                className="w-full mt-3 bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 rounded-xl text-sm"
-              >
-                Place Order
-              </button>
-            </div>
-          ))}
-        </div>
-      </div>
 
+        {error && (
+          <div className="bg-red-50 border border-red-200 text-red-600 text-sm rounded-xl px-4 py-3 mb-4">
+            ⚠️ {error}
+          </div>
+        )}
+
+        {loading ? (
+          <div className="text-center py-12">
+            <p className="text-gray-400 text-sm">⏳ Loading products...</p>
+          </div>
+        ) : (
+          <>
+            <p className="text-sm text-gray-500 mb-4">{filtered.length} listings found</p>
+            {filtered.length === 0 ? (
+              <div className="text-center py-12">
+                <p className="text-gray-400">No crops found. Try a different search or category.</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {filtered.map((item) => (
+                  <div key={item._id} className="bg-white rounded-2xl shadow p-5 border border-gray-100 relative">
+                    {item.pricePerUnit === cheapest[item.name] && (
+                      <span className="absolute top-3 right-3 bg-orange-100 text-orange-600 text-xs font-bold px-2 py-1 rounded-full">
+                        🏷️ Cheapest
+                      </span>
+                    )}
+                    <h3 className="font-bold text-gray-800 text-lg">🌾 {item.name}</h3>
+                    <p className="text-sm text-gray-500 mt-1">👨‍🌾 {item.farmer?.name || 'Farmer'}</p>
+                    <p className="text-sm text-gray-500">📍 {item.location}</p>
+                    <p className="text-sm text-gray-500">📦 {item.quantity} {item.unit}</p>
+                    <p className="text-sm text-gray-500">⭐ {item.farmer?.rating?.toFixed(1) || '—'}</p>
+                    <div className="flex justify-between items-center mt-3">
+                      <p className="text-green-600 font-bold text-lg">₹{item.pricePerUnit}/{item.unit}</p>
+                      <span className={`text-xs px-2 py-1 rounded-full ${item.isAvailable ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-600'}`}>
+                        {item.isAvailable ? 'Available' : 'Sold Out'}
+                      </span>
+                    </div>
+                    <button
+                      onClick={() => onOrder(item)}
+                      disabled={!item.isAvailable}
+                      className="w-full mt-3 bg-orange-500 hover:bg-orange-600 disabled:bg-gray-200 disabled:text-gray-400 text-white font-bold py-2 rounded-xl text-sm"
+                    >
+                      {item.isAvailable ? 'Place Order' : 'Sold Out'}
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </>
+        )}
+      </div>
     </div>
   );
 };
