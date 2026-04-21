@@ -23,8 +23,8 @@ function App() {
   const [page, setPage] = useState("landing");
   const [user, setUser] = useState(null);
   const [selectedCrop, setSelectedCrop] = useState(null);
-  const navigate = useNavigate(); // FIX navigate
-  const { login, logout } = useAuth(); // FIX login/logout
+  const navigate = useNavigate();
+  const { login, logout } = useAuth();
 
   useEffect(() => {
     const savedUser = localStorage.getItem("user");
@@ -42,11 +42,12 @@ function App() {
 
   const handleLogin = (userData) => {
     setUser(userData);
+    login(userData);
     localStorage.setItem("user", JSON.stringify(userData));
     if (userData.role === "farmer") {
-      setPage("farmerDashboard");
+      navigate("/farmer");
     } else {
-      setPage("buyerMarketplace");
+      navigate("/buyer");
     }
   };
 
