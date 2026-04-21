@@ -3,6 +3,7 @@ import LandingPage from './pages/LandingPage';
 import AuthPage from './pages/AuthPage';
 import FarmerDashboard from './pages/FarmerDashboard';
 import BuyerMarketplace from './pages/BuyerMarketplace';
+import OrderPage from './pages/OrderPage';
 
 function App() {
   const [page, setPage] = useState('landing');
@@ -41,6 +42,14 @@ function App() {
       )}
       {page === 'buyerMarketplace' && (
         <BuyerMarketplace user={user} onLogout={handleLogout} onOrder={handleOrder} />
+      )}
+      {page === 'orderPage' && (
+        <OrderPage
+          user={user}
+          crop={selectedCrop}
+          onBack={() => setPage('buyerMarketplace')}
+          onOrderPlaced={() => setPage('buyerMarketplace')}
+        />
       )}
     </div>
   );
