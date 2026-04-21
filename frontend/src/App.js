@@ -5,6 +5,7 @@ import FarmerDashboard from './pages/FarmerDashboard';
 import BuyerMarketplace from './pages/BuyerMarketplace';
 import OrderPage from './pages/OrderPage';
 import DemandChart from './pages/DemandChart';
+import FarmerProfile from './pages/FarmerProfile';
 
 function App() {
   const [page, setPage] = useState('landing');
@@ -39,23 +40,16 @@ function App() {
         <AuthPage onLogin={handleLogin} />
       )}
       {page === 'farmerDashboard' && (
-        <FarmerDashboard user={user} onLogout={handleLogout} />
+        <FarmerDashboard user={user} onLogout={handleLogout} onViewProfile={() => setPage('farmerProfile')} />
+      )}
+      {page === 'farmerProfile' && (
+        <FarmerProfile user={user} onBack={() => setPage('farmerDashboard')} />
       )}
       {page === 'buyerMarketplace' && (
-        <BuyerMarketplace
-          user={user}
-          onLogout={handleLogout}
-          onOrder={handleOrder}
-          onViewChart={() => setPage('demandChart')}
-        />
+        <BuyerMarketplace user={user} onLogout={handleLogout} onOrder={handleOrder} onViewChart={() => setPage('demandChart')} />
       )}
       {page === 'orderPage' && (
-        <OrderPage
-          user={user}
-          crop={selectedCrop}
-          onBack={() => setPage('buyerMarketplace')}
-          onOrderPlaced={() => setPage('buyerMarketplace')}
-        />
+        <OrderPage user={user} crop={selectedCrop} onBack={() => setPage('buyerMarketplace')} onOrderPlaced={() => setPage('buyerMarketplace')} />
       )}
       {page === 'demandChart' && (
         <DemandChart onBack={() => setPage('buyerMarketplace')} />

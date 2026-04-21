@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-const FarmerDashboard = ({ user, onLogout }) => {
+const FarmerDashboard = ({ user, onLogout, onViewProfile }) => {
   const [activeTab, setActiveTab] = useState('listings');
   const [listings, setListings] = useState([
     { id: 1, crop: 'Wheat', quantity: '5 Quintal', price: '2200', status: 'Active' },
@@ -25,6 +25,12 @@ const FarmerDashboard = ({ user, onLogout }) => {
           <span className="text-xl font-bold text-green-700">KisanConnect</span>
         </div>
         <div className="flex items-center gap-3">
+          <button
+            onClick={onViewProfile}
+            className="text-sm bg-green-50 text-green-700 px-3 py-1 rounded-lg border border-green-200"
+          >
+            👤 My Profile
+          </button>
           <span className="text-sm text-gray-500">🧑‍🌾 {user?.email}</span>
           <button
             onClick={onLogout}
