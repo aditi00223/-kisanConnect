@@ -10,7 +10,7 @@ const crops = [
   { id: 7, crop: 'Rice', farmer: 'Mohan Lal', location: 'Ambala, Haryana', quantity: '10 Quintal', price: 3100, rating: 4.1 },
 ];
 
-const BuyerMarketplace = ({ user, onLogout, onOrder }) => {
+const BuyerMarketplace = ({ user, onLogout, onOrder, onViewChart }) => {
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState('All');
 
@@ -24,7 +24,6 @@ const BuyerMarketplace = ({ user, onLogout, onOrder }) => {
     return matchCategory && matchSearch;
   });
 
-  // Group by crop to show cheapest
   const cheapest = {};
   crops.forEach((c) => {
     if (!cheapest[c.crop] || c.price < cheapest[c.crop]) {
@@ -42,6 +41,12 @@ const BuyerMarketplace = ({ user, onLogout, onOrder }) => {
           <span className="text-xl font-bold text-green-700">KisanConnect</span>
         </div>
         <div className="flex items-center gap-3">
+          <button
+            onClick={onViewChart}
+            className="text-sm bg-green-50 text-green-700 px-3 py-1 rounded-lg border border-green-200"
+          >
+            📈 Price Trends
+          </button>
           <span className="text-sm text-gray-500">🛒 {user?.email}</span>
           <button
             onClick={onLogout}
@@ -90,24 +95,19 @@ const BuyerMarketplace = ({ user, onLogout, onOrder }) => {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {filtered.map((item) => (
             <div key={item.id} className="bg-white rounded-2xl shadow p-5 border border-gray-100 relative">
-
-              {/* Cheapest badge */}
               {item.price === cheapest[item.crop] && (
                 <span className="absolute top-3 right-3 bg-orange-100 text-orange-600 text-xs font-bold px-2 py-1 rounded-full">
                   🏷️ Cheapest
                 </span>
               )}
-
               <h3 className="font-bold text-gray-800 text-lg">🌾 {item.crop}</h3>
               <p className="text-sm text-gray-500 mt-1">👨‍🌾 {item.farmer}</p>
               <p className="text-sm text-gray-500">📍 {item.location}</p>
               <p className="text-sm text-gray-500">📦 {item.quantity}</p>
-
               <div className="flex justify-between items-center mt-3">
                 <p className="text-green-600 font-bold text-lg">₹{item.price}/q</p>
                 <p className="text-yellow-500 text-sm">⭐ {item.rating}</p>
               </div>
-
               <button
                 onClick={() => onOrder(item)}
                 className="w-full mt-3 bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 rounded-xl text-sm"
