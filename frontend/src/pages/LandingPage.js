@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import i18n from '../i18n';
 
-const LandingPage = () => {
+const LandingPage = ({ onGetStarted }) => {
   const { t } = useTranslation();
   const [lang, setLang] = useState('en');
 
@@ -42,10 +42,14 @@ const LandingPage = () => {
         <h1 className="text-3xl font-bold mb-2">{t('welcome')}</h1>
         <p className="text-orange-300 text-lg font-medium mb-8">{t('tagline')}</p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <button className="bg-orange-500 hover:bg-orange-600 text-white text-lg font-bold px-8 py-4 rounded-xl">
+          <button
+            onClick={onGetStarted}
+            className="bg-orange-500 hover:bg-orange-600 text-white text-lg font-bold px-8 py-4 rounded-xl">
             🧑‍🌾 {t('farmer')} — {t('register')}
           </button>
-          <button className="bg-white hover:bg-gray-100 text-green-700 text-lg font-bold px-8 py-4 rounded-xl">
+          <button
+            onClick={onGetStarted}
+            className="bg-white hover:bg-gray-100 text-green-700 text-lg font-bold px-8 py-4 rounded-xl">
             🛒 {t('buyer')} — {t('register')}
           </button>
         </div>
