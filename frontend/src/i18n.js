@@ -41,6 +41,15 @@ i18n.use(initReactI18next).init({
         reject: "Reject",
         pending: "Pending",
         active: "Active",
+        howItWorks: "How It Works",
+        step1Title: "Farmer Lists Crop",
+        step1Desc: "Add crop name, price, quantity and farm location",
+        step2Title: "Buyer Browses",
+        step2Desc: "Compare prices from multiple farmers for same crop",
+        step3Title: "Direct Deal",
+        step3Desc: "Order, pay via UPI or cash, collect from farm",
+        trustedBy: "Trusted by 1000+ Farmers across Punjab, Haryana & UP",
+        noCommission: "No commission. No middleman. Full price to the farmer.",
       }
     },
     hi: {
@@ -81,6 +90,15 @@ i18n.use(initReactI18next).init({
         reject: "अस्वीकार करें",
         pending: "लंबित",
         active: "सक्रिय",
+        howItWorks: "यह कैसे काम करता है",
+        step1Title: "किसान फसल लिस्ट करता है",
+        step1Desc: "फसल का नाम, कीमत, मात्रा और खेत की जगह डालें",
+        step2Title: "खरीदार देखता है",
+        step2Desc: "एक ही फसल के लिए कई किसानों की कीमत तुलना करें",
+        step3Title: "सीधा सौदा",
+        step3Desc: "ऑर्डर करें, UPI या नकद से भुगतान करें, खेत से लें",
+        trustedBy: "पंजाब, हरियाणा और UP के 1000+ किसानों का भरोसा",
+        noCommission: "कोई कमीशन नहीं। कोई बिचौलिया नहीं। किसान को पूरी कीमत।",
       }
     },
     pa: {
@@ -121,6 +139,15 @@ i18n.use(initReactI18next).init({
         reject: "ਰੱਦ ਕਰੋ",
         pending: "ਬਕਾਇਆ",
         active: "ਸਰਗਰਮ",
+        howItWorks: "ਇਹ ਕਿਵੇਂ ਕੰਮ ਕਰਦਾ ਹੈ",
+        step1Title: "ਕਿਸਾਨ ਫਸਲ ਲਿਸਟ ਕਰਦਾ ਹੈ",
+        step1Desc: "ਫਸਲ ਦਾ ਨਾਮ, ਕੀਮਤ, ਮਾਤਰਾ ਅਤੇ ਖੇਤ ਦੀ ਜਗ੍ਹਾ ਦਰਜ ਕਰੋ",
+        step2Title: "ਖਰੀਦਦਾਰ ਦੇਖਦਾ ਹੈ",
+        step2Desc: "ਇੱਕੋ ਫਸਲ ਲਈ ਕਈ ਕਿਸਾਨਾਂ ਦੀਆਂ ਕੀਮਤਾਂ ਤੁਲਨਾ ਕਰੋ",
+        step3Title: "ਸਿੱਧਾ ਸੌਦਾ",
+        step3Desc: "ਆਰਡਰ ਕਰੋ, UPI ਜਾਂ ਨਕਦ ਨਾਲ ਭੁਗਤਾਨ ਕਰੋ, ਖੇਤ ਤੋਂ ਲਓ",
+        trustedBy: "ਪੰਜਾਬ, ਹਰਿਆਣਾ ਅਤੇ UP ਦੇ 1000+ ਕਿਸਾਨਾਂ ਦਾ ਭਰੋਸਾ",
+        noCommission: "ਕੋਈ ਕਮਿਸ਼ਨ ਨਹੀਂ। ਕੋਈ ਵਿਚੋਲਾ ਨਹੀਂ। ਕਿਸਾਨ ਨੂੰ ਪੂਰੀ ਕੀਮਤ।",
       }
     }
   },

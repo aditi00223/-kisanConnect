@@ -57,12 +57,12 @@ const LandingPage = ({ onGetStarted }) => {
 
       {/* How it works */}
       <section className="px-6 py-12 text-center">
-        <h2 className="text-2xl font-bold text-green-700 mb-8">How It Works</h2>
+        <h2 className="text-2xl font-bold text-green-700 mb-8">{t('howItWorks')}</h2>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-4xl mx-auto">
           {[
-            { icon: '📋', title: 'Farmer Lists Crop', desc: 'Add crop name, price, quantity and farm location' },
-            { icon: '🔍', title: 'Buyer Browses', desc: 'Compare prices from multiple farmers for same crop' },
-            { icon: '🤝', title: 'Direct Deal', desc: 'Order, pay via UPI or cash, collect from farm' },
+            { icon: '📋', title: t('step1Title'), desc: t('step1Desc') },
+            { icon: '🔍', title: t('step2Title'), desc: t('step2Desc') },
+            { icon: '🤝', title: t('step3Title'), desc: t('step3Desc') },
           ].map((step, i) => (
             <div key={i} className="bg-white rounded-2xl shadow p-6">
               <div className="text-4xl mb-3">{step.icon}</div>
@@ -76,14 +76,14 @@ const LandingPage = ({ onGetStarted }) => {
       {/* Trust Bar */}
       <section className="bg-orange-50 px-6 py-8 text-center">
         <p className="text-orange-600 font-bold text-lg">
-          ⭐ Trusted by 1000+ Farmers across Punjab, Haryana & UP
+          ⭐ {t('trustedBy')}
         </p>
-        <p className="text-gray-500 text-sm mt-1">No commission. No middleman. Full price to the farmer.</p>
+        <p className="text-gray-500 text-sm mt-1">{t('noCommission')}</p>
       </section>
 
       {/* Footer */}
       <footer className="bg-green-700 text-white text-center py-4 text-sm">
-        🌾 KisanConnect — Seedha Kisan, Seedha Daam
+        🌾 KisanConnect — {t('tagline')}
       </footer>
 
     </div>
