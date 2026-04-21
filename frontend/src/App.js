@@ -9,10 +9,10 @@ import FarmerProfile from './pages/FarmerProfile';
 import ForumPage from './pages/ForumPage';
 import WalletPage from './pages/WalletPage';
 
-function AppRoutes() {
-  const { user, login, logout } = useAuth();
+function App() {
+  const [page, setPage] = useState('landing');
+  const [user, setUser] = useState(null);
   const [selectedCrop, setSelectedCrop] = useState(null);
-  const navigate = useNavigate();
 
   // Auto-login if token exists in localStorage
   useEffect(() => {
@@ -30,11 +30,12 @@ function AppRoutes() {
   }, []);
 
   const handleLogin = (userData) => {
-    login(userData);
+    setUser(userData);
+    localStorage.setItem('user', JSON.stringify(userData));
     if (userData.role === 'farmer') {
-      navigate('/farmer');
+      setPage('farmerDashboard');
     } else {
-      navigate('/buyer');
+      setPage('buyerMarketplace');
     }
   };
 

@@ -12,23 +12,23 @@ const LandingPage = ({ onGetStarted }) => {
   };
 
   return (
-    <div className="min-h-screen bg-[#fafaf9] font-sans">
+    <div className="min-h-screen bg-[#f5f5f0] font-sans">
 
       {/* Navbar */}
-      <nav className="bg-white shadow-sm px-6 py-4 flex justify-between items-center">
+      <nav className="bg-white border-b border-gray-100 px-6 py-3 flex justify-between items-center sticky top-0 z-50">
         <div className="flex items-center gap-2">
-          <span className="text-2xl">🌾</span>
-          <span className="text-xl font-bold text-green-700">KisanConnect</span>
+          <span style={{fontSize: '24px'}}>🌾</span>
+          <span className="text-xl font-bold text-[#2E7D32]">KisanConnect</span>
         </div>
         <div className="flex gap-2">
           {['en', 'hi', 'pa'].map((l) => (
             <button
               key={l}
               onClick={() => changeLanguage(l)}
-              className={`px-3 py-1 rounded-full text-sm font-medium border ${
+              className={`px-3 py-1 rounded-full text-xs font-medium border transition-all ${
                 lang === l
-                  ? 'bg-green-600 text-white border-green-600'
-                  : 'text-green-700 border-green-300'
+                  ? 'bg-[#2E7D32] text-white border-[#2E7D32]'
+                  : 'text-[#2E7D32] border-[#2E7D32] bg-white'
               }`}
             >
               {l === 'en' ? 'EN' : l === 'hi' ? 'HI' : 'PA'}
@@ -38,52 +38,74 @@ const LandingPage = ({ onGetStarted }) => {
       </nav>
 
       {/* Hero */}
-      <section className="bg-green-700 text-white px-6 py-16 text-center">
-        <h1 className="text-3xl font-bold mb-2">{t('welcome')}</h1>
-        <p className="text-orange-300 text-lg font-medium mb-8">{t('tagline')}</p>
-        <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <button
-            onClick={onGetStarted}
-            className="bg-orange-500 hover:bg-orange-600 text-white text-lg font-bold px-8 py-4 rounded-xl">
-            🧑‍🌾 {t('farmer')} — {t('register')}
-          </button>
-          <button
-            onClick={onGetStarted}
-            className="bg-white hover:bg-gray-100 text-green-700 text-lg font-bold px-8 py-4 rounded-xl">
-            🛒 {t('buyer')} — {t('register')}
-          </button>
+      <section className="bg-[#2E7D32] px-6 py-14 text-center">
+        <div className="max-w-xl mx-auto">
+          <div style={{fontSize: '64px', marginBottom: '16px'}}>🌾</div>
+          <h1 className="text-3xl font-bold text-[#C0DD97] mb-2">
+            {t('welcome')}
+          </h1>
+          <p className="text-[#9FE1CB] text-base mb-10">
+            {t('tagline')}
+          </p>
+          <div className="grid grid-cols-2 gap-4 max-w-sm mx-auto">
+            <button
+              onClick={onGetStarted}
+              className="bg-[#FF8F00] hover:bg-[#e67e00] text-white font-bold px-6 py-4 rounded-2xl text-sm transition-all shadow-md">
+              🧑‍🌾 {t('farmer')}
+              <span className="block text-xs font-normal opacity-80 mt-1">List & sell crops</span>
+            </button>
+            <button
+              onClick={onGetStarted}
+              className="bg-white hover:bg-gray-50 text-[#2E7D32] font-bold px-6 py-4 rounded-2xl text-sm transition-all shadow-md">
+              🛒 {t('buyer')}
+              <span className="block text-xs font-normal opacity-70 mt-1">Browse & order</span>
+            </button>
+          </div>
         </div>
       </section>
 
       {/* How it works */}
-      <section className="px-6 py-12 text-center">
-        <h2 className="text-2xl font-bold text-green-700 mb-8">{t('howItWorks')}</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-4xl mx-auto">
+      <section className="px-6 py-12 bg-white">
+        <h2 className="text-xs font-medium text-gray-400 text-center uppercase tracking-widest mb-8">
+          {t('howItWorks')}
+        </h2>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-3xl mx-auto">
           {[
-            { icon: '📋', title: t('step1Title'), desc: t('step1Desc') },
-            { icon: '🔍', title: t('step2Title'), desc: t('step2Desc') },
-            { icon: '🤝', title: t('step3Title'), desc: t('step3Desc') },
+            { icon: '📋', title: t('step1Title'), desc: t('step1Desc'), color: 'bg-[#E8F5E9]' },
+            { icon: '🔍', title: t('step2Title'), desc: t('step2Desc'), color: 'bg-[#E3F2FD]' },
+            { icon: '🤝', title: t('step3Title'), desc: t('step3Desc'), color: 'bg-[#FFF8E1]' },
           ].map((step, i) => (
-            <div key={i} className="bg-white rounded-2xl shadow p-6">
-              <div className="text-4xl mb-3">{step.icon}</div>
-              <h3 className="font-bold text-green-700 text-lg mb-2">{step.title}</h3>
-              <p className="text-gray-500 text-sm">{step.desc}</p>
+            <div key={i} className="bg-[#f5f5f0] rounded-2xl p-6 text-center border border-gray-100">
+              <div className={`w-12 h-12 ${step.color} rounded-xl flex items-center justify-center text-2xl mx-auto mb-4`}>
+                {step.icon}
+              </div>
+              <h3 className="font-bold text-[#2E7D32] text-sm mb-2">{step.title}</h3>
+              <p className="text-gray-400 text-xs leading-relaxed">{step.desc}</p>
             </div>
           ))}
         </div>
       </section>
 
       {/* Trust Bar */}
-      <section className="bg-orange-50 px-6 py-8 text-center">
-        <p className="text-orange-600 font-bold text-lg">
-          ⭐ {t('trustedBy')}
-        </p>
-        <p className="text-gray-500 text-sm mt-1">{t('noCommission')}</p>
+      <section className="bg-[#E8F5E9] border-y border-[#C0DD97] px-6 py-6">
+        <div className="flex justify-center gap-10 flex-wrap">
+          {[
+            { num: '2,400+', label: 'Farmers' },
+            { num: '0%', label: 'Commission' },
+            { num: '18+', label: 'Crops listed' },
+            { num: 'Punjab', label: '& growing' },
+          ].map((item, i) => (
+            <div key={i} className="text-center">
+              <div className="text-xl font-bold text-[#2E7D32]">{item.num}</div>
+              <div className="text-xs text-[#3B6D11]">{item.label}</div>
+            </div>
+          ))}
+        </div>
       </section>
 
       {/* Footer */}
-      <footer className="bg-green-700 text-white text-center py-4 text-sm">
-        🌾 KisanConnect — {t('tagline')}
+      <footer className="bg-[#1B5E20] text-[#9FE1CB] text-center py-4 text-xs">
+        KisanConnect — {t('tagline')}
       </footer>
 
     </div>
