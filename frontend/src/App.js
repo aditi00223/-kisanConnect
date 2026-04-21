@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import LandingPage from './pages/LandingPage';
 import AuthPage from './pages/AuthPage';
+import FarmerDashboard from './pages/FarmerDashboard';
 
 function App() {
   const [page, setPage] = useState('landing');
@@ -8,7 +9,16 @@ function App() {
 
   const handleLogin = (userData) => {
     setUser(userData);
-    alert(`Welcome ${userData.name || userData.email}! Logged in as ${userData.role}`);
+    if (userData.role === 'farmer') {
+      setPage('farmerDashboard');
+    } else {
+      setPage('buyerMarketplace');
+    }
+  };
+
+  const handleLogout = () => {
+    setUser(null);
+    setPage('landing');
   };
 
   return (
@@ -18,6 +28,9 @@ function App() {
       )}
       {page === 'auth' && (
         <AuthPage onLogin={handleLogin} />
+      )}
+      {page === 'farmerDashboard' && (
+        <FarmerDashboard user={user} onLogout={handleLogout} />
       )}
     </div>
   );
