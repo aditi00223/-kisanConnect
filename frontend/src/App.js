@@ -2,10 +2,12 @@ import React, { useState } from 'react';
 import LandingPage from './pages/LandingPage';
 import AuthPage from './pages/AuthPage';
 import FarmerDashboard from './pages/FarmerDashboard';
+import BuyerMarketplace from './pages/BuyerMarketplace';
 
 function App() {
   const [page, setPage] = useState('landing');
   const [user, setUser] = useState(null);
+  const [selectedCrop, setSelectedCrop] = useState(null);
 
   const handleLogin = (userData) => {
     setUser(userData);
@@ -21,6 +23,11 @@ function App() {
     setPage('landing');
   };
 
+  const handleOrder = (crop) => {
+    setSelectedCrop(crop);
+    setPage('orderPage');
+  };
+
   return (
     <div>
       {page === 'landing' && (
@@ -31,6 +38,9 @@ function App() {
       )}
       {page === 'farmerDashboard' && (
         <FarmerDashboard user={user} onLogout={handleLogout} />
+      )}
+      {page === 'buyerMarketplace' && (
+        <BuyerMarketplace user={user} onLogout={handleLogout} onOrder={handleOrder} />
       )}
     </div>
   );
