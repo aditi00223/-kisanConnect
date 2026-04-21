@@ -1,95 +1,56 @@
 import React, { useState } from 'react';
-import { useTranslation } from 'react-i18next';
+import api from '../api';
 
-const AuthPage = ({ onLogin }) => {
-  const { t } = useTranslation();
+const AuthPage = () => {
   const [isLogin, setIsLogin] = useState(true);
   const [role, setRole] = useState('farmer');
   const [form, setForm] = useState({ name: '', email: '', password: '' });
+  const [error, setError] = useState('');
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!form.email || !form.password) return alert('Please fill all fields');
-    onLogin({ ...form, role });
+    try {
+      const endpoint = isLogin ? '/auth/login' : '/auth/register';
+      const payload = isLogin ? { email: form.email, password: form.password } : { ...form, role };
+      const res = await api.post(endpoint, payload);
+      localStorage.setItem('token', res.data.token);
+      localStorage.setItem('role', res.data.user.role);
+      alert(isLogin ? 'Login successful!' : 'Registered successfully!');
+    } catch (err) {
+      setError(err.response?.data?.message || 'Something went wrong');
+    }
   };
 
   return (
     <div className="min-h-screen bg-[#fafaf9] flex items-center justify-center px-4">
       <div className="bg-white rounded-2xl shadow-lg w-full max-w-md p-8">
-
-        {/* Logo */}
-        <div className="text-center mb-6">
-          <span className="text-4xl">🌾</span>
-          <h1 className="text-2xl font-bold text-green-700 mt-1">KisanConnect</h1>
-          <p className="text-orange-500 text-sm">Seedha Kisan, Seedha Daam</p>
-        </div>
-
-        {/* Role Toggle */}
-        <div className="flex rounded-xl overflow-hidden border border-green-200 mb-6">
-          {['farmer', 'buyer'].map((r) => (
-            <button
-              key={r}
-              onClick={() => setRole(r)}
-              className={`flex-1 py-3 font-semibold text-sm transition-all ${
-                role === r
-                  ? 'bg-green-600 text-white'
-                  : 'bg-white text-green-700'
-              }`}
-            >
-              {r === 'farmer' ? '🧑‍🌾 Farmer' : '🛒 Buyer'}
-            </button>
-          ))}
-        </div>
-
-        {/* Login/Register Toggle */}
-        <div className="flex rounded-xl overflow-hidden border border-gray-200 mb-6">
-          {[true, false].map((val) => (
-            <button
-              key={String(val)}
-              onClick={() => setIsLogin(val)}
-              className={`flex-1 py-2 text-sm font-medium transition-all ${
-                isLogin === val
-                  ? 'bg-orange-500 text-white'
-                  : 'bg-white text-gray-500'
-              }`}
-            >
-              {val ? t('login') : t('register')}
-            </button>
-          ))}
-        </div>
-
-        {/* Form */}
-        <div className="flex flex-col gap-4">
-          {!isLogin && (
-            <input
-              type="text"
-              placeholder="Full Name"
-              className="border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-green-400"
-              value={form.name}
-              onChange={(e) => setForm({ ...form, name: e.target.value })}
-            />
-          )}
-          <input
-            type="email"
-            placeholder="Email Address"
-            className="border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-green-400"
-            value={form.email}
-            onChange={(e) => setForm({ ...form, email: e.target.value })}
-          />
-          <input
-            type="password"
-            placeholder="Password"
-            className="border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-green-400"
-            value={form.password}
-            onChange={(e) => setForm({ ...form, password: e.target.value })}
-          />
-          <button
-            onClick={handleSubmit}
-            className="bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-xl text-sm"
-          >
-            {isLogin ? t('login') : t('register')} as {role === 'farmer' ? '🧑‍🌾 Farmer' : '🛒 Buyer'}
-          </button>
-        </div>
-
+        <h2 className="text-center text-2xl font-bold text-green-700 mb-6">
+          {isLogin ? 'Login' : 'Register'} — KisanConnect
+        </h2>
+        {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
+        {!isLogin && (
+          <input className="w-full border rounded-lg px-4 py-2 mb-3" placeholder="Full Name"
+            value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} />
+        )}
+        <input className="w-full border rounded-lg px-4 py-2 mb-3" placeholder="Email"
+          value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} />
+        <input className="w-full border rounded-lg px-4 py-2 mb-3" type="password" placeholder="Password"
+          value={form.password} onChange={e => setForm({ ...form, password: e.target.value })} />
+        {!isLogin && (
+          <select className="w-full border rounded-lg px-4 py-2 mb-3"
+            value={role} onChange={e => setRole(e.target.value)}>
+            <option value="farmer">Farmer</option>
+            <option value="buyer">Buyer</option>
+          </select>
+        )}
+        <button onClick={handleSubmit}
+          className="w-full bg-green-600 text-white py-2 rounded-lg font-semibold hover:bg-green-700">
+          {isLogin ? 'Login' : 'Register'}
+        </button>
+        <p className="text-center text-sm mt-4 text-gray-500 cursor-pointer"
+          onClick={() => setIsLogin(!isLogin)}>
+          {isLogin ? "Don't have an account? Register" : "Already have an account? Login"}
+        </p>
       </div>
     </div>
   );
