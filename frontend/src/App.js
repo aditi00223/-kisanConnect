@@ -115,12 +115,7 @@ function App() {
   );
 }
 
-function App() {
-  return (
-    <BrowserRouter>
-      <AppRoutes />
-    </BrowserRouter>
-  );
-}
+
+  
 
 export default App;
