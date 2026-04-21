@@ -6,31 +6,24 @@ const LandingPage = ({ onGetStarted }) => {
   const { t } = useTranslation();
   const [lang, setLang] = useState('en');
 
-  const changeLanguage = (l) => {
-    setLang(l);
-    i18n.changeLanguage(l);
-  };
+  const changeLanguage = (l) => { setLang(l); i18n.changeLanguage(l); };
 
   return (
-    <div className="min-h-screen bg-[#f5f5f0] font-sans">
+    <div style={{ minHeight: '100vh', background: 'linear-gradient(160deg, #f0f7e6 0%, #fffbf2 60%, #fff4ec 100%)', fontFamily: 'sans-serif' }}>
 
       {/* Navbar */}
-      <nav className="bg-white border-b border-gray-100 px-6 py-3 flex justify-between items-center sticky top-0 z-50">
-        <div className="flex items-center gap-2">
-          <span style={{fontSize: '24px'}}>🌾</span>
-          <span className="text-xl font-bold text-[#2E7D32]">KisanConnect</span>
+      <nav style={{ background: '#fff', borderBottom: '1px solid #e2f0cc', padding: '12px 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'sticky', top: 0, zIndex: 50, boxShadow: '0 2px 12px #3B6D1110' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <div style={{ width: 32, height: 32, borderRadius: 8, background: 'linear-gradient(135deg, #eaf3de, #fef9ec)', border: '1px solid #c0dd97', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18 }}>🌾</div>
+          <span style={{ fontWeight: 700, fontSize: 18, color: '#27500a' }}>KisanConnect</span>
         </div>
-        <div className="flex gap-2">
+        <div style={{ display: 'flex', gap: 6 }}>
           {['en', 'hi', 'pa'].map((l) => (
-            <button
-              key={l}
-              onClick={() => changeLanguage(l)}
-              className={`px-3 py-1 rounded-full text-xs font-medium border transition-all ${
-                lang === l
-                  ? 'bg-[#2E7D32] text-white border-[#2E7D32]'
-                  : 'text-[#2E7D32] border-[#2E7D32] bg-white'
-              }`}
-            >
+            <button key={l} onClick={() => changeLanguage(l)}
+              style={{ padding: '5px 12px', borderRadius: 999, fontSize: 11, fontWeight: 700, cursor: 'pointer', border: '1px solid', transition: 'all 0.2s',
+                background: lang === l ? '#3B6D11' : 'transparent',
+                color: lang === l ? '#fff' : '#3B6D11',
+                borderColor: lang === l ? '#3B6D11' : '#c0dd97' }}>
               {l === 'en' ? 'EN' : l === 'hi' ? 'HI' : 'PA'}
             </button>
           ))}
@@ -38,76 +31,66 @@ const LandingPage = ({ onGetStarted }) => {
       </nav>
 
       {/* Hero */}
-      <section className="bg-[#2E7D32] px-6 py-14 text-center">
-        <div className="max-w-xl mx-auto">
-          <div style={{fontSize: '64px', marginBottom: '16px'}}>🌾</div>
-          <h1 className="text-3xl font-bold text-[#C0DD97] mb-2">
-            {t('welcome')}
-          </h1>
-          <p className="text-[#9FE1CB] text-base mb-10">
-            {t('tagline')}
-          </p>
-          <div className="grid grid-cols-2 gap-4 max-w-sm mx-auto">
-            <button
-              onClick={onGetStarted}
-              className="bg-[#FF8F00] hover:bg-[#e67e00] text-white font-bold px-6 py-4 rounded-2xl text-sm transition-all shadow-md">
+      <section style={{ background: 'linear-gradient(135deg, #27500a 0%, #3B6D11 50%, #639922 100%)', padding: '64px 24px', textAlign: 'center', position: 'relative', overflow: 'hidden' }}>
+        <div style={{ position: 'absolute', inset: 0, opacity: 0.1, backgroundImage: 'radial-gradient(circle at 75% 50%, #f59e0b, transparent 55%)', pointerEvents: 'none' }} />
+        <div style={{ maxWidth: 520, margin: '0 auto', position: 'relative' }}>
+          <div style={{ width: 72, height: 72, borderRadius: 20, background: 'rgba(255,255,255,0.12)', border: '1px solid rgba(255,255,255,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 36, margin: '0 auto 20px' }}>🌾</div>
+          <h1 style={{ fontSize: 30, fontWeight: 700, color: '#c0dd97', margin: '0 0 10px' }}>{t('welcome')}</h1>
+          <p style={{ fontSize: 14, color: '#9fe1cb', marginBottom: 36 }}>{t('tagline')}</p>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, maxWidth: 360, margin: '0 auto' }}>
+            <button onClick={onGetStarted}
+              style={{ padding: '18px 12px', borderRadius: 18, border: 'none', cursor: 'pointer', background: 'linear-gradient(135deg, #d97706, #f59e0b)', color: '#fff', fontWeight: 700, fontSize: 14, boxShadow: '0 4px 16px #d9770650', textAlign: 'center' }}>
               🧑‍🌾 {t('farmer')}
-              <span className="block text-xs font-normal opacity-80 mt-1">List & sell crops</span>
+              <span style={{ display: 'block', fontSize: 11, fontWeight: 400, opacity: 0.85, marginTop: 4 }}>List &amp; sell crops</span>
             </button>
-            <button
-              onClick={onGetStarted}
-              className="bg-white hover:bg-gray-50 text-[#2E7D32] font-bold px-6 py-4 rounded-2xl text-sm transition-all shadow-md">
+            <button onClick={onGetStarted}
+              style={{ padding: '18px 12px', borderRadius: 18, border: '1px solid rgba(255,255,255,0.25)', cursor: 'pointer', background: 'rgba(255,255,255,0.12)', color: '#fff', fontWeight: 700, fontSize: 14, textAlign: 'center' }}>
               🛒 {t('buyer')}
-              <span className="block text-xs font-normal opacity-70 mt-1">Browse & order</span>
+              <span style={{ display: 'block', fontSize: 11, fontWeight: 400, opacity: 0.75, marginTop: 4 }}>Browse &amp; order</span>
             </button>
           </div>
         </div>
       </section>
 
       {/* How it works */}
-      <section className="px-6 py-12 bg-white">
-        <h2 className="text-xs font-medium text-gray-400 text-center uppercase tracking-widest mb-8">
-          {t('howItWorks')}
-        </h2>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-3xl mx-auto">
+      <section style={{ padding: '48px 24px', background: '#fff' }}>
+        <p style={{ fontSize: 11, fontWeight: 600, color: '#9aab87', textAlign: 'center', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 28 }}>{t('howItWorks')}</p>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 16, maxWidth: 800, margin: '0 auto' }}>
           {[
-            { icon: '📋', title: t('step1Title'), desc: t('step1Desc'), color: 'bg-[#E8F5E9]' },
-            { icon: '🔍', title: t('step2Title'), desc: t('step2Desc'), color: 'bg-[#E3F2FD]' },
-            { icon: '🤝', title: t('step3Title'), desc: t('step3Desc'), color: 'bg-[#FFF8E1]' },
+            { icon: '📋', title: t('step1Title'), desc: t('step1Desc'), iconBg: '#eaf3de', iconBorder: '#c0dd97' },
+            { icon: '🔍', title: t('step2Title'), desc: t('step2Desc'), iconBg: '#e6f1fb', iconBorder: '#b5d4f4' },
+            { icon: '🤝', title: t('step3Title'), desc: t('step3Desc'), iconBg: '#faeeda', iconBorder: '#fac775' },
           ].map((step, i) => (
-            <div key={i} className="bg-[#f5f5f0] rounded-2xl p-6 text-center border border-gray-100">
-              <div className={`w-12 h-12 ${step.color} rounded-xl flex items-center justify-center text-2xl mx-auto mb-4`}>
-                {step.icon}
-              </div>
-              <h3 className="font-bold text-[#2E7D32] text-sm mb-2">{step.title}</h3>
-              <p className="text-gray-400 text-xs leading-relaxed">{step.desc}</p>
+            <div key={i} style={{ background: 'linear-gradient(160deg, #f0f7e6, #fffbf4)', borderRadius: 20, padding: 24, textAlign: 'center', border: '1px solid #e2f0cc' }}>
+              <div style={{ width: 48, height: 48, borderRadius: 14, background: step.iconBg, border: `1px solid ${step.iconBorder}`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22, margin: '0 auto 14px' }}>{step.icon}</div>
+              <h3 style={{ fontWeight: 700, color: '#27500a', fontSize: 13, margin: '0 0 8px' }}>{step.title}</h3>
+              <p style={{ color: '#9aab87', fontSize: 12, lineHeight: 1.6, margin: 0 }}>{step.desc}</p>
             </div>
           ))}
         </div>
       </section>
 
       {/* Trust Bar */}
-      <section className="bg-[#E8F5E9] border-y border-[#C0DD97] px-6 py-6">
-        <div className="flex justify-center gap-10 flex-wrap">
+      <section style={{ background: '#eaf3de', borderTop: '1px solid #c0dd97', borderBottom: '1px solid #c0dd97', padding: '20px 24px' }}>
+        <div style={{ display: 'flex', justifyContent: 'center', gap: 48, flexWrap: 'wrap' }}>
           {[
             { num: '2,400+', label: 'Farmers' },
             { num: '0%', label: 'Commission' },
             { num: '18+', label: 'Crops listed' },
             { num: 'Punjab', label: '& growing' },
-          ].map((item, i) => (
-            <div key={i} className="text-center">
-              <div className="text-xl font-bold text-[#2E7D32]">{item.num}</div>
-              <div className="text-xs text-[#3B6D11]">{item.label}</div>
+          ].map(({ num, label }) => (
+            <div key={label} style={{ textAlign: 'center' }}>
+              <p style={{ fontWeight: 700, fontSize: 20, color: '#27500a', margin: 0 }}>{num}</p>
+              <p style={{ fontSize: 11, color: '#639922', margin: 0 }}>{label}</p>
             </div>
           ))}
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="bg-[#1B5E20] text-[#9FE1CB] text-center py-4 text-xs">
+      <footer style={{ background: '#1B5E20', color: '#9fe1cb', textAlign: 'center', padding: '16px 24px', fontSize: 12 }}>
         KisanConnect — {t('tagline')}
       </footer>
-
     </div>
   );
 };
