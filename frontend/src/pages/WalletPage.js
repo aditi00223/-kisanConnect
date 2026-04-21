@@ -10,21 +10,16 @@ const WalletPage = ({ user, onBack }) => {
   const token = localStorage.getItem('token');
   const authHeader = { Authorization: `Bearer ${token}` };
 
-  useEffect(() => {
-    fetchWallet();
-  }, []);
+  useEffect(() => { fetchWallet(); }, []);
 
   const fetchWallet = async () => {
-    setLoading(true);
-    setError('');
+    setLoading(true); setError('');
     try {
       const res = await fetch(`${API}/api/wallet`, { headers: authHeader });
       const data = await res.json();
       if (!res.ok) { setError(data.message); setLoading(false); return; }
       setWallet(data.wallet);
-    } catch {
-      setError('Cannot connect to server.');
-    }
+    } catch { setError('Cannot connect to server.'); }
     setLoading(false);
   };
 
@@ -37,123 +32,121 @@ const WalletPage = ({ user, onBack }) => {
     return `${Math.floor(hrs / 24)}d ago`;
   };
 
-  const totalCredits = wallet?.transactions
-    ?.filter((t) => t.type === 'credit')
-    .reduce((sum, t) => sum + t.amount, 0) || 0;
-
-  const totalDebits = wallet?.transactions
-    ?.filter((t) => t.type === 'debit')
-    .reduce((sum, t) => sum + t.amount, 0) || 0;
+  const totalCredits = wallet?.transactions?.filter((t) => t.type === 'credit').reduce((s, t) => s + t.amount, 0) || 0;
 
   return (
-    <div className="min-h-screen bg-[#fafaf9]">
+    <div style={{ minHeight: '100vh', background: 'linear-gradient(160deg, #f0f7e6 0%, #fffbf2 60%, #fff4ec 100%)' }}>
 
       {/* Navbar */}
-      <nav className="bg-white shadow-sm px-6 py-4 flex justify-between items-center">
-        <div className="flex items-center gap-2">
-          <span className="text-2xl">🌾</span>
-          <span className="text-xl font-bold text-green-700">KisanConnect</span>
+      <nav style={{ background: '#fff', borderBottom: '1px solid #e2f0cc', padding: '12px 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'sticky', top: 0, zIndex: 10, boxShadow: '0 2px 12px #3B6D1110' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <div style={{ width: 32, height: 32, borderRadius: 8, background: 'linear-gradient(135deg, #eaf3de, #fef9ec)', border: '1px solid #c0dd97', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18 }}>🌾</div>
+          <span style={{ fontWeight: 700, fontSize: 18, color: '#27500a' }}>KisanConnect</span>
         </div>
-        <button
-          onClick={onBack}
-          className="text-sm text-green-700 border border-green-300 px-3 py-1 rounded-lg"
-        >
+        <button onClick={onBack} style={{ fontSize: 12, fontWeight: 600, padding: '6px 14px', borderRadius: 8, border: '1px solid #c0dd97', background: '#f0f7e6', color: '#3B6D11', cursor: 'pointer' }}>
           ← Back
         </button>
       </nav>
 
-      {/* Header */}
-      <div className="bg-green-700 text-white px-6 py-6">
-        <h1 className="text-2xl font-bold">My Wallet 💰</h1>
-        <p className="text-green-200 text-sm mt-1">Track your earnings and transactions</p>
+      {/* Hero */}
+      <div style={{ background: 'linear-gradient(135deg, #27500a 0%, #3B6D11 50%, #639922 100%)', padding: '32px 24px', position: 'relative', overflow: 'hidden' }}>
+        <div style={{ position: 'absolute', inset: 0, opacity: 0.1, backgroundImage: 'radial-gradient(circle at 80% 50%, #f59e0b, transparent 60%)', pointerEvents: 'none' }} />
+        <div style={{ maxWidth: 640, margin: '0 auto', position: 'relative' }}>
+          <h1 style={{ color: '#fff', fontSize: 22, fontWeight: 700, margin: 0 }}>My Wallet 💰</h1>
+          <p style={{ color: '#c0dd97', fontSize: 13, marginTop: 4 }}>Track your earnings and transactions</p>
+        </div>
       </div>
 
-      <div className="px-6 py-6 max-w-2xl mx-auto">
+      <div style={{ maxWidth: 640, margin: '0 auto', padding: 24 }}>
 
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-600 text-sm rounded-xl px-4 py-3 mb-4">
+          <div style={{ background: '#faece7', border: '1px solid #f5c4b3', color: '#993c1d', fontSize: 13, borderRadius: 12, padding: '12px 16px', marginBottom: 16 }}>
             ⚠️ {error}
           </div>
         )}
 
         {loading ? (
-          <p className="text-center text-gray-400 text-sm py-8">⏳ Loading wallet...</p>
+          <div style={{ textAlign: 'center', padding: '64px 0' }}>
+            <div style={{ fontSize: 36, marginBottom: 8 }}>💰</div>
+            <p style={{ color: '#9aab87', fontSize: 13 }}>Loading wallet...</p>
+          </div>
         ) : !wallet ? (
-          <p className="text-center text-gray-400 text-sm py-8">No wallet found.</p>
+          <div style={{ textAlign: 'center', padding: '64px 0' }}>
+            <p style={{ fontSize: 36, marginBottom: 8 }}>👛</p>
+            <p style={{ color: '#9aab87', fontSize: 13 }}>No wallet found.</p>
+          </div>
         ) : (
           <>
             {/* Balance Card */}
-            <div className="bg-green-700 text-white rounded-2xl shadow p-6 mb-6">
-              <p className="text-green-200 text-sm">Available Balance</p>
-              <p className="text-4xl font-bold mt-1">₹{wallet.balance.toLocaleString()}</p>
-              <p className="text-green-300 text-xs mt-3">
-                Payments released after buyer pickup confirmation
-              </p>
+            <div style={{ background: 'linear-gradient(135deg, #27500a 0%, #3B6D11 60%, #639922 100%)', borderRadius: 20, padding: 28, marginBottom: 16, position: 'relative', overflow: 'hidden' }}>
+              <div style={{ position: 'absolute', right: -20, top: -20, width: 100, height: 100, borderRadius: '50%', background: 'rgba(255,255,255,0.07)' }} />
+              <div style={{ position: 'absolute', right: 24, bottom: -28, width: 90, height: 90, borderRadius: '50%', background: 'rgba(245,158,11,0.15)' }} />
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'relative' }}>
+                <div>
+                  <p style={{ color: '#c0dd97', fontSize: 12, margin: 0 }}>Available Balance</p>
+                  <p style={{ color: '#fff', fontWeight: 700, fontSize: 36, margin: '6px 0 0' }}>₹{wallet.balance.toLocaleString()}</p>
+                  <p style={{ color: '#9fe1cb', fontSize: 11, marginTop: 8 }}>Payments released after buyer pickup confirmation</p>
+                </div>
+                <div style={{ width: 52, height: 52, borderRadius: 16, background: 'rgba(255,255,255,0.12)', border: '1px solid rgba(255,255,255,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 26, flexShrink: 0 }}>💰</div>
+              </div>
             </div>
 
             {/* Stats Row */}
-            <div className="grid grid-cols-2 gap-4 mb-6">
-              <div className="bg-white rounded-2xl shadow p-5 text-center border border-gray-100">
-                <p className="text-xs text-gray-500 mb-1">Total Received</p>
-                <p className="text-2xl font-bold text-green-700">₹{totalCredits.toLocaleString()}</p>
-                <p className="text-xs text-green-500 mt-1">📈 Credits</p>
-              </div>
-              <div className="bg-white rounded-2xl shadow p-5 text-center border border-gray-100">
-                <p className="text-xs text-gray-500 mb-1">Total Transactions</p>
-                <p className="text-2xl font-bold text-orange-600">{wallet.transactions?.length || 0}</p>
-                <p className="text-xs text-gray-400 mt-1">📋 All time</p>
-              </div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, marginBottom: 16 }}>
+              {[
+                { label: 'Total Received', value: `₹${totalCredits.toLocaleString()}`, sub: '📈 Credits', color: '#3B6D11', bg: '#eaf3de', border: '#c0dd97' },
+                { label: 'Total Transactions', value: wallet.transactions?.length || 0, sub: '📋 All time', color: '#854f0b', bg: '#faeeda', border: '#fac775' },
+              ].map(({ label, value, sub, color, bg, border }) => (
+                <div key={label} style={{ background: '#fff', borderRadius: 20, padding: '20px 16px', textAlign: 'center', border: `1px solid ${border}`, boxShadow: '0 2px 12px #3B6D1108' }}>
+                  <p style={{ fontSize: 11, color: '#9aab87', margin: '0 0 6px' }}>{label}</p>
+                  <p style={{ fontWeight: 700, fontSize: 22, color, margin: 0 }}>{value}</p>
+                  <p style={{ fontSize: 11, color: '#9aab87', marginTop: 4 }}>{sub}</p>
+                </div>
+              ))}
             </div>
 
             {/* How it works */}
-            <div className="bg-orange-50 rounded-2xl p-4 mb-6 border border-orange-100">
-              <h3 className="text-sm font-bold text-orange-700 mb-2">💡 How payments work</h3>
-              <div className="flex flex-col gap-2">
+            <div style={{ background: '#faeeda', border: '1px solid #fac775', borderRadius: 20, padding: 20, marginBottom: 16 }}>
+              <h3 style={{ fontSize: 13, fontWeight: 700, color: '#854f0b', margin: '0 0 14px' }}>💡 How payments work</h3>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                 {[
-                  { step: '1', text: 'Buyer places order and pays via UPI — amount is held' },
-                  { step: '2', text: 'Farmer confirms the order' },
-                  { step: '3', text: 'Buyer picks up crop from farm' },
-                  { step: '4', text: 'Payment is released to your wallet instantly ✅' },
-                ].map((s) => (
-                  <div key={s.step} className="flex items-start gap-2">
-                    <span className="w-5 h-5 bg-orange-500 text-white rounded-full text-xs flex items-center justify-center flex-shrink-0 mt-0.5">
-                      {s.step}
-                    </span>
-                    <p className="text-xs text-orange-700">{s.text}</p>
+                  'Buyer places order and pays via UPI — amount is held',
+                  'Farmer confirms the order',
+                  'Buyer picks up crop from farm',
+                  'Payment is released to your wallet instantly ✅',
+                ].map((text, i) => (
+                  <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
+                    <span style={{ width: 20, height: 20, borderRadius: '50%', background: '#d97706', color: '#fff', fontSize: 10, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 1 }}>{i + 1}</span>
+                    <p style={{ fontSize: 12, color: '#854f0b', margin: 0, lineHeight: 1.5 }}>{text}</p>
                   </div>
                 ))}
               </div>
             </div>
 
             {/* Transaction History */}
-            <div className="bg-white rounded-2xl shadow p-6 border border-gray-100">
-              <h2 className="text-lg font-bold text-green-700 mb-4">Transaction History</h2>
-
-              {wallet.transactions?.length === 0 ? (
-                <p className="text-gray-400 text-sm text-center py-4">
-                  No transactions yet. Complete an order to receive payment!
-                </p>
+            <div style={{ background: '#fff', borderRadius: 20, padding: 24, border: '1px solid #e2f0cc', boxShadow: '0 2px 12px #3B6D1108' }}>
+              <h2 style={{ color: '#27500a', fontSize: 15, fontWeight: 700, margin: '0 0 16px' }}>Transaction History</h2>
+              {!wallet.transactions?.length ? (
+                <div style={{ textAlign: 'center', padding: '24px 0' }}>
+                  <p style={{ fontSize: 28, marginBottom: 6 }}>📭</p>
+                  <p style={{ fontSize: 13, color: '#9aab87' }}>No transactions yet. Complete an order to receive payment!</p>
+                </div>
               ) : (
-                <div className="flex flex-col gap-3">
-                  {[...wallet.transactions].reverse().map((txn, i) => (
-                    <div
-                      key={i}
-                      className="flex items-center justify-between py-3 border-b border-gray-50 last:border-0"
-                    >
-                      <div className="flex items-center gap-3">
-                        <span className={`w-9 h-9 rounded-full flex items-center justify-center text-lg ${
-                          txn.type === 'credit' ? 'bg-green-100' : 'bg-red-100'
-                        }`}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                  {[...wallet.transactions].reverse().map((txn, i, arr) => (
+                    <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 0', borderBottom: i < arr.length - 1 ? '1px solid #f0f7e6' : 'none' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                        <div style={{ width: 38, height: 38, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, flexShrink: 0,
+                          background: txn.type === 'credit' ? '#eaf3de' : '#faece7',
+                          border: `1px solid ${txn.type === 'credit' ? '#c0dd97' : '#f5c4b3'}` }}>
                           {txn.type === 'credit' ? '📥' : '📤'}
-                        </span>
+                        </div>
                         <div>
-                          <p className="text-sm font-medium text-gray-800">{txn.description}</p>
-                          <p className="text-xs text-gray-400">{timeAgo(txn.date)}</p>
+                          <p style={{ fontSize: 13, fontWeight: 600, color: '#27500a', margin: 0 }}>{txn.description}</p>
+                          <p style={{ fontSize: 11, color: '#9aab87', margin: 0 }}>{timeAgo(txn.date)}</p>
                         </div>
                       </div>
-                      <span className={`text-sm font-bold ${
-                        txn.type === 'credit' ? 'text-green-600' : 'text-red-500'
-                      }`}>
+                      <span style={{ fontWeight: 700, fontSize: 14, color: txn.type === 'credit' ? '#3B6D11' : '#993c1d', flexShrink: 0, marginLeft: 12 }}>
                         {txn.type === 'credit' ? '+' : '-'}₹{txn.amount.toLocaleString()}
                       </span>
                     </div>
