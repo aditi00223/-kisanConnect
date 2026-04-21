@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { BrowserRouter, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import LandingPage from './pages/LandingPage';
 import AuthPage from './pages/AuthPage';
 import FarmerDashboard from './pages/FarmerDashboard';
@@ -8,23 +9,24 @@ import DemandChart from './pages/DemandChart';
 import FarmerProfile from './pages/FarmerProfile';
 import ForumPage from './pages/ForumPage';
 import WalletPage from './pages/WalletPage';
+import ProtectedRoute from './components/ProtectedRoute';
+import { useAuth } from './context/AuthContext';
 
 function App() {
   const [page, setPage] = useState('landing');
   const [user, setUser] = useState(null);
   const [selectedCrop, setSelectedCrop] = useState(null);
 
-  // Auto-login if token exists in localStorage
   useEffect(() => {
     const savedUser = localStorage.getItem('user');
     const token = localStorage.getItem('token');
     if (savedUser && token) {
       const parsedUser = JSON.parse(savedUser);
-      setUser(parsedUser);
+      login(parsedUser);
       if (parsedUser.role === 'farmer') {
-        setPage('farmerDashboard');
+        navigate('/farmer');
       } else {
-        setPage('buyerMarketplace');
+        navigate('/buyer');
       }
     }
   }, []);
@@ -42,73 +44,82 @@ function App() {
   const handleLogout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
-    setUser(null);
-    setPage('landing');
-  };
-
-  const handleOrder = (crop) => {
-    setSelectedCrop(crop);
-    setPage('orderPage');
+    logout();
+    navigate('/');
   };
 
   return (
-    <div>
-      {page === 'landing' && (
-        <LandingPage onGetStarted={() => setPage('auth')} />
-      )}
+    <Routes>
+      <Route path="/" element={<LandingPage onGetStarted={() => navigate('/auth')} />} />
+      <Route path="/auth" element={<AuthPage onLogin={handleLogin} />} />
 
-      {page === 'auth' && (
-        <AuthPage onLogin={handleLogin} />
-      )}
+      <Route path="/farmer" element={
+        <ProtectedRoute user={user}>
+          <FarmerDashboard
+            user={user}
+            onLogout={handleLogout}
+            onViewProfile={() => navigate('/farmer/profile')}
+            onViewWallet={() => navigate('/farmer/wallet')}
+            onViewForum={() => navigate('/forum')}
+          />
+        </ProtectedRoute>
+      } />
+      <Route path="/farmer/profile" element={
+        <ProtectedRoute user={user}>
+          <FarmerProfile user={user} onBack={() => navigate('/farmer')} />
+        </ProtectedRoute>
+      } />
+      <Route path="/farmer/wallet" element={
+        <ProtectedRoute user={user}>
+          <WalletPage user={user} onBack={() => navigate('/farmer')} />
+        </ProtectedRoute>
+      } />
 
-      {page === 'farmerDashboard' && (
-        <FarmerDashboard
-          user={user}
-          onLogout={handleLogout}
-          onViewProfile={() => setPage('farmerProfile')}
-          onViewWallet={() => setPage('walletPage')}
-          onViewForum={() => setPage('forumPage')}
-        />
-      )}
+      <Route path="/buyer" element={
+        <ProtectedRoute user={user}>
+          <BuyerMarketplace
+            user={user}
+            onLogout={handleLogout}
+            onOrder={(crop) => { setSelectedCrop(crop); navigate('/order'); }}
+            onViewChart={() => navigate('/chart')}
+            onViewForum={() => navigate('/forum')}
+          />
+        </ProtectedRoute>
+      } />
+      <Route path="/order" element={
+        <ProtectedRoute user={user}>
+          <OrderPage
+            user={user}
+            crop={selectedCrop}
+            onBack={() => navigate('/buyer')}
+            onOrderPlaced={() => navigate('/buyer')}
+          />
+        </ProtectedRoute>
+      } />
+      <Route path="/chart" element={
+        <ProtectedRoute user={user}>
+          <DemandChart onBack={() => navigate('/buyer')} />
+        </ProtectedRoute>
+      } />
+      <Route path="/forum" element={
+        <ProtectedRoute user={user}>
+          <ForumPage
+            user={user}
+            onBack={() => user?.role === 'farmer' ? navigate('/farmer') : navigate('/buyer')}
+          />
+        </ProtectedRoute>
+      } />
 
-      {page === 'farmerProfile' && (
-        <FarmerProfile user={user} onBack={() => setPage('farmerDashboard')} />
-      )}
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
+  );
+}
 
-      {page === 'buyerMarketplace' && (
-        <BuyerMarketplace
-          user={user}
-          onLogout={handleLogout}
-          onOrder={handleOrder}
-          onViewChart={() => setPage('demandChart')}
-          onViewForum={() => setPage('forumPage')}
-        />
-      )}
-
-      {page === 'orderPage' && (
-        <OrderPage
-          user={user}
-          crop={selectedCrop}
-          onBack={() => setPage('buyerMarketplace')}
-          onOrderPlaced={() => setPage('buyerMarketplace')}
-        />
-      )}
-
-      {page === 'demandChart' && (
-        <DemandChart onBack={() => setPage('buyerMarketplace')} />
-      )}
-
-      {page === 'forumPage' && (
-        <ForumPage
-          user={user}
-          onBack={() => user?.role === 'farmer' ? setPage('farmerDashboard') : setPage('buyerMarketplace')}
-        />
-      )}
-
-      {page === 'walletPage' && (
-        <WalletPage user={user} onBack={() => setPage('farmerDashboard')} />
-      )}
-    </div>
+function App() {
+  return (
+    <BrowserRouter>
+      <AppRoutes />
+    </BrowserRouter>
   );
 }
 
