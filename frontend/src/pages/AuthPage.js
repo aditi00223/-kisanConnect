@@ -172,4 +172,4 @@ const AuthPage = ({ onLogin }) => {
   );
 };
 
-export default AuthPa
+export default AuthPage;
