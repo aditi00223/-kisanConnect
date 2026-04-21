@@ -15,6 +15,7 @@ app.use('/api/auth', require('./src/routes/authRoutes'));
 app.use('/api/products', require('./src/routes/productRoutes'));
 app.use('/api/orders', require('./src/routes/orderRoutes'));
 app.use('/api/wallet', require('./src/routes/walletRoutes'));
+app.use('/api/forum', require('./src/routes/forumRoutes'));
 
 app.get('/', (req, res) => {
   res.json({ message: 'KisanConnect API is running 🌾' });
