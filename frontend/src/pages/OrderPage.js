@@ -2,6 +2,13 @@ import React, { useState } from 'react';
 
 const API = 'http://localhost:5000';
 
+const statusMeta = {
+  placed:    { label: 'Placed',    bg: '#faeeda', color: '#854f0b', border: '#fac775' },
+  confirmed: { label: 'Confirmed', bg: '#e6f1fb', color: '#185fa5', border: '#b5d4f4' },
+  pickedup:  { label: 'Picked Up', bg: '#eaf3de', color: '#3B6D11', border: '#c0dd97' },
+  cancelled: { label: 'Cancelled', bg: '#faece7', color: '#993c1d', border: '#f5c4b3' },
+};
+
 const OrderPage = ({ user, crop, onBack, onOrderPlaced }) => {
   const [payment, setPayment] = useState('upi');
   const [quantity, setQuantity] = useState(1);
@@ -17,97 +24,73 @@ const OrderPage = ({ user, crop, onBack, onOrderPlaced }) => {
     setError('');
     if (!quantity || quantity < 1) return setError('Please enter a valid quantity');
     if (quantity > crop?.quantity) return setError(`Only ${crop?.quantity} ${crop?.unit} available`);
-
     setLoading(true);
     try {
       const res = await fetch(`${API}/api/orders`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          productId: crop?._id || crop?.id,
-          quantity: Number(quantity),
-          paymentMethod: payment,
-        }),
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ productId: crop?._id || crop?.id, quantity: Number(quantity), paymentMethod: payment }),
       });
-
       const data = await res.json();
-
-      if (!res.ok) {
-        setError(data.message || 'Failed to place order');
-        setLoading(false);
-        return;
-      }
-
+      if (!res.ok) { setError(data.message || 'Failed to place order'); setLoading(false); return; }
       setOrderData(data.order);
       setOrdered(true);
-    } catch {
-      setError('Cannot connect to server. Make sure backend is running.');
-    }
+    } catch { setError('Cannot connect to server. Make sure backend is running.'); }
     setLoading(false);
   };
 
-  // Mark as picked up
   const handleMarkPickup = async () => {
     try {
       const res = await fetch(`${API}/api/orders/${orderData._id}/pickup`, {
-        method: 'PUT',
-        headers: { Authorization: `Bearer ${token}` },
+        method: 'PUT', headers: { Authorization: `Bearer ${token}` },
       });
-      if (res.ok) {
-        const data = await res.json();
-        setOrderData(data.order);
-      }
-    } catch {
-      setError('Failed to mark pickup');
-    }
+      if (res.ok) { const data = await res.json(); setOrderData(data.order); }
+    } catch { setError('Failed to mark pickup'); }
   };
 
+  const inputStyle = { border: '1px solid #d4e8b0', background: '#f9fdf4', borderRadius: 12, padding: '12px 16px', fontSize: 13, color: '#27500a', outline: 'none', width: '100%', boxSizing: 'border-box' };
+
+  // Success Screen
   if (ordered && orderData) {
+    const sm = statusMeta[orderData.status] || { label: orderData.status, bg: '#f1efe8', color: '#5F5E5A', border: '#d3d1c7' };
     return (
-      <div className="min-h-screen bg-[#fafaf9] flex items-center justify-center px-4">
-        <div className="bg-white rounded-2xl shadow-lg w-full max-w-md p-8 text-center">
-          <div className="text-6xl mb-4">🎉</div>
-          <h2 className="text-2xl font-bold text-green-700 mb-2">Order Placed!</h2>
-          <p className="text-gray-500 text-sm mb-6">
-            Your order for <strong>{crop?.name || crop?.crop}</strong> from{' '}
-            <strong>{crop?.farmer?.name || crop?.farmer}</strong> has been placed successfully.
+      <div style={{ minHeight: '100vh', background: 'linear-gradient(160deg, #f0f7e6 0%, #fffbf2 60%, #fff4ec 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24 }}>
+        <div style={{ background: '#fff', borderRadius: 24, width: '100%', maxWidth: 440, padding: 36, textAlign: 'center', border: '1px solid #e2f0cc', boxShadow: '0 4px 24px #3B6D1112' }}>
+          <div style={{ width: 72, height: 72, borderRadius: '50%', background: 'linear-gradient(135deg, #eaf3de, #fef9ec)', border: '2px solid #c0dd97', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 36, margin: '0 auto 16px' }}>🎉</div>
+          <h2 style={{ fontSize: 22, fontWeight: 700, color: '#27500a', margin: '0 0 8px' }}>Order Placed!</h2>
+          <p style={{ fontSize: 13, color: '#9aab87', marginBottom: 24 }}>
+            Your order for <strong style={{ color: '#27500a' }}>{crop?.name || crop?.crop}</strong> from <strong style={{ color: '#27500a' }}>{crop?.farmer?.name || crop?.farmer}</strong> has been placed successfully.
           </p>
-          <div className="bg-green-50 rounded-xl p-4 text-left mb-6">
-            <p className="text-sm text-gray-600">📦 Crop: <strong>{crop?.name || crop?.crop}</strong></p>
-            <p className="text-sm text-gray-600">👨‍🌾 Farmer: <strong>{crop?.farmer?.name || crop?.farmer}</strong></p>
-            <p className="text-sm text-gray-600">📍 Location: <strong>{crop?.location}</strong></p>
-            <p className="text-sm text-gray-600">📦 Quantity: <strong>{orderData.quantity} {crop?.unit}</strong></p>
-            <p className="text-sm text-gray-600">💰 Total: <strong>₹{orderData.totalPrice}</strong></p>
-            <p className="text-sm text-gray-600">💳 Payment: <strong>{payment === 'upi' ? 'UPI' : 'Cash on Pickup'}</strong></p>
-            <p className="text-sm mt-2">
-              <span className={`px-2 py-1 rounded-full text-xs font-bold ${
-                orderData.status === 'placed' ? 'bg-yellow-100 text-yellow-700' :
-                orderData.status === 'confirmed' ? 'bg-blue-100 text-blue-700' :
-                orderData.status === 'pickedup' ? 'bg-green-100 text-green-700' :
-                'bg-gray-100 text-gray-600'
-              }`}>
-                Status: {orderData.status}
+
+          <div style={{ background: '#f9fdf4', border: '1px solid #e2f0cc', borderRadius: 16, padding: '16px 20px', textAlign: 'left', marginBottom: 20 }}>
+            {[
+              { icon: '📦', label: 'Crop', val: crop?.name || crop?.crop },
+              { icon: '🧑‍🌾', label: 'Farmer', val: crop?.farmer?.name || crop?.farmer },
+              { icon: '📍', label: 'Location', val: crop?.location },
+              { icon: '📦', label: 'Quantity', val: `${orderData.quantity} ${crop?.unit}` },
+              { icon: '💰', label: 'Total', val: `₹${orderData.totalPrice}` },
+              { icon: '💳', label: 'Payment', val: payment === 'upi' ? 'UPI' : 'Cash on Pickup' },
+            ].map(({ icon, label, val }) => (
+              <div key={label} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '7px 0', borderBottom: '1px solid #f0f7e6' }}>
+                <span style={{ fontSize: 12, color: '#9aab87' }}>{icon} {label}</span>
+                <span style={{ fontSize: 13, fontWeight: 600, color: '#27500a' }}>{val}</span>
+              </div>
+            ))}
+            <div style={{ paddingTop: 10, textAlign: 'center' }}>
+              <span style={{ fontSize: 11, fontWeight: 700, padding: '4px 12px', borderRadius: 999, background: sm.bg, color: sm.color, border: `1px solid ${sm.border}` }}>
+                {sm.label}
               </span>
-            </p>
+            </div>
           </div>
 
-          {/* Mark Pickup button — only when confirmed */}
           {orderData.status === 'confirmed' && (
-            <button
-              onClick={handleMarkPickup}
-              className="w-full mb-3 bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-xl text-sm"
-            >
+            <button onClick={handleMarkPickup}
+              style={{ width: '100%', marginBottom: 10, padding: '13px', borderRadius: 14, border: 'none', cursor: 'pointer', fontWeight: 700, fontSize: 13, color: '#fff', background: 'linear-gradient(135deg, #3B6D11, #639922)', boxShadow: '0 4px 14px #3B6D1140' }}>
               ✅ Mark as Picked Up
             </button>
           )}
-
-          <button
-            onClick={onBack}
-            className="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 rounded-xl text-sm"
-          >
+          <button onClick={onBack}
+            style={{ width: '100%', padding: '13px', borderRadius: 14, border: 'none', cursor: 'pointer', fontWeight: 700, fontSize: 13, color: '#fff', background: 'linear-gradient(135deg, #d97706, #f59e0b)', boxShadow: '0 4px 14px #d9770640' }}>
             🛒 Back to Marketplace
           </button>
         </div>
@@ -116,88 +99,95 @@ const OrderPage = ({ user, crop, onBack, onOrderPlaced }) => {
   }
 
   return (
-    <div className="min-h-screen bg-[#fafaf9]">
+    <div style={{ minHeight: '100vh', background: 'linear-gradient(160deg, #f0f7e6 0%, #fffbf2 60%, #fff4ec 100%)' }}>
 
       {/* Navbar */}
-      <nav className="bg-white shadow-sm px-6 py-4 flex justify-between items-center">
-        <div className="flex items-center gap-2">
-          <span className="text-2xl">🌾</span>
-          <span className="text-xl font-bold text-green-700">KisanConnect</span>
+      <nav style={{ background: '#fff', borderBottom: '1px solid #e2f0cc', padding: '12px 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'sticky', top: 0, zIndex: 10, boxShadow: '0 2px 12px #3B6D1110' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <div style={{ width: 32, height: 32, borderRadius: 8, background: 'linear-gradient(135deg, #eaf3de, #fef9ec)', border: '1px solid #c0dd97', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18 }}>🌾</div>
+          <span style={{ fontWeight: 700, fontSize: 18, color: '#27500a' }}>KisanConnect</span>
         </div>
-        <button
-          onClick={onBack}
-          className="text-sm text-green-700 border border-green-300 px-3 py-1 rounded-lg"
-        >
+        <button onClick={onBack} style={{ fontSize: 12, fontWeight: 600, padding: '6px 14px', borderRadius: 8, border: '1px solid #c0dd97', background: '#f0f7e6', color: '#3B6D11', cursor: 'pointer' }}>
           ← Back
         </button>
       </nav>
 
-      <div className="px-6 py-8 max-w-md mx-auto">
-        <h1 className="text-2xl font-bold text-green-700 mb-6">Place Order 📦</h1>
+      {/* Hero */}
+      <div style={{ background: 'linear-gradient(135deg, #27500a 0%, #3B6D11 50%, #639922 100%)', padding: '32px 24px', position: 'relative', overflow: 'hidden' }}>
+        <div style={{ position: 'absolute', inset: 0, opacity: 0.1, backgroundImage: 'radial-gradient(circle at 80% 50%, #f59e0b, transparent 60%)', pointerEvents: 'none' }} />
+        <div style={{ maxWidth: 480, margin: '0 auto', position: 'relative' }}>
+          <h1 style={{ color: '#fff', fontSize: 22, fontWeight: 700, margin: 0 }}>Place Order 📦</h1>
+          <p style={{ color: '#c0dd97', fontSize: 13, marginTop: 4 }}>Review and confirm your order</p>
+        </div>
+      </div>
+
+      <div style={{ maxWidth: 480, margin: '0 auto', padding: 24 }}>
 
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-600 text-sm rounded-xl px-4 py-3 mb-4">
+          <div style={{ background: '#faece7', border: '1px solid #f5c4b3', color: '#993c1d', fontSize: 13, borderRadius: 12, padding: '12px 16px', marginBottom: 16 }}>
             ⚠️ {error}
           </div>
         )}
 
         {/* Crop Summary */}
-        <div className="bg-white rounded-2xl shadow p-5 mb-6 border border-gray-100">
-          <h3 className="font-bold text-gray-800 text-lg">🌾 {crop?.name || crop?.crop}</h3>
-          <p className="text-sm text-gray-500 mt-1">👨‍🌾 {crop?.farmer?.name || crop?.farmer}</p>
-          <p className="text-sm text-gray-500">📍 {crop?.location}</p>
-          <p className="text-sm text-gray-500">📦 Available: {crop?.quantity} {crop?.unit}</p>
-          <p className="text-green-600 font-bold text-lg mt-2">
-            ₹{crop?.pricePerUnit || crop?.price}/{crop?.unit || 'quintal'}
-          </p>
+        <div style={{ background: '#fff', borderRadius: 20, padding: 20, marginBottom: 16, border: '1px solid #e2f0cc', boxShadow: '0 2px 12px #3B6D1108' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 14 }}>
+            <div style={{ width: 44, height: 44, borderRadius: 12, background: '#eaf3de', border: '1px solid #c0dd97', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, flexShrink: 0 }}>🌾</div>
+            <div>
+              <h3 style={{ fontWeight: 700, color: '#27500a', fontSize: 16, margin: 0 }}>{crop?.name || crop?.crop}</h3>
+              <p style={{ fontSize: 12, color: '#9aab87', margin: 0 }}>🧑‍🌾 {crop?.farmer?.name || crop?.farmer}</p>
+            </div>
+          </div>
+          <div style={{ paddingTop: 14, borderTop: '1px solid #f0f7e6' }}>
+            {[
+              { icon: '📍', val: crop?.location },
+              { icon: '📦', val: `Available: ${crop?.quantity} ${crop?.unit}` },
+            ].map(({ icon, val }) => (
+              <p key={icon} style={{ fontSize: 12, color: '#5F5E5A', margin: '4px 0' }}>{icon} {val}</p>
+            ))}
+            <p style={{ fontWeight: 700, fontSize: 18, color: '#3B6D11', margin: '10px 0 0' }}>
+              ₹{crop?.pricePerUnit || crop?.price}<span style={{ fontSize: 12, fontWeight: 400, color: '#9aab87' }}>/{crop?.unit || 'quintal'}</span>
+            </p>
+          </div>
         </div>
 
         {/* Quantity */}
-        <div className="bg-white rounded-2xl shadow p-5 mb-6 border border-gray-100">
-          <label className="text-sm font-medium text-gray-700 mb-2 block">
+        <div style={{ background: '#fff', borderRadius: 20, padding: 20, marginBottom: 16, border: '1px solid #e2f0cc', boxShadow: '0 2px 12px #3B6D1108' }}>
+          <label style={{ fontSize: 13, fontWeight: 600, color: '#27500a', display: 'block', marginBottom: 10 }}>
             Quantity ({crop?.unit || 'quintal'})
           </label>
-          <input
-            type="number"
-            min="1"
-            max={crop?.quantity}
-            value={quantity}
-            onChange={(e) => setQuantity(Number(e.target.value))}
-            className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-green-400"
-          />
-          <p className="text-green-600 font-bold mt-3 text-lg">
-            Total: ₹{total}
-          </p>
+          <input type="number" min="1" max={crop?.quantity} value={quantity}
+            onChange={(e) => setQuantity(Number(e.target.value))} style={inputStyle} />
+          <div style={{ marginTop: 12, padding: '10px 14px', borderRadius: 12, background: '#eaf3de', border: '1px solid #c0dd97', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <span style={{ fontSize: 13, color: '#3B6D11' }}>Total</span>
+            <span style={{ fontWeight: 700, fontSize: 18, color: '#3B6D11' }}>₹{total}</span>
+          </div>
         </div>
 
         {/* Payment Method */}
-        <div className="bg-white rounded-2xl shadow p-5 mb-6 border border-gray-100">
-          <p className="text-sm font-medium text-gray-700 mb-3">Payment Method</p>
-          <div className="flex gap-3">
+        <div style={{ background: '#fff', borderRadius: 20, padding: 20, marginBottom: 20, border: '1px solid #e2f0cc', boxShadow: '0 2px 12px #3B6D1108' }}>
+          <p style={{ fontSize: 13, fontWeight: 600, color: '#27500a', margin: '0 0 12px' }}>Payment Method</p>
+          <div style={{ display: 'flex', gap: 10 }}>
             {[
-              { key: 'upi', label: '📱 UPI Payment', desc: 'Pay online instantly' },
-              { key: 'cash', label: '💵 Cash on Pickup', desc: 'Pay at the farm' },
+              { key: 'upi',  label: '📱 UPI Payment',     desc: 'Pay online instantly' },
+              { key: 'cash', label: '💵 Cash on Pickup',  desc: 'Pay at the farm' },
             ].map((p) => (
-              <button
-                key={p.key}
-                onClick={() => setPayment(p.key)}
-                className={`flex-1 p-3 rounded-xl border-2 text-left transition-all ${
-                  payment === p.key ? 'border-green-500 bg-green-50' : 'border-gray-200 bg-white'
-                }`}
-              >
-                <p className="font-medium text-sm">{p.label}</p>
-                <p className="text-xs text-gray-400 mt-1">{p.desc}</p>
+              <button key={p.key} onClick={() => setPayment(p.key)}
+                style={{ flex: 1, padding: '12px 10px', borderRadius: 14, textAlign: 'left', cursor: 'pointer', transition: 'all 0.2s',
+                  border: payment === p.key ? '2px solid #3B6D11' : '1px solid #e2f0cc',
+                  background: payment === p.key ? '#eaf3de' : '#f9fdf4' }}>
+                <p style={{ fontWeight: 700, fontSize: 13, color: '#27500a', margin: 0 }}>{p.label}</p>
+                <p style={{ fontSize: 11, color: '#9aab87', marginTop: 4 }}>{p.desc}</p>
               </button>
             ))}
           </div>
         </div>
 
-        {/* Place Order Button */}
-        <button
-          onClick={handlePlaceOrder}
-          disabled={loading}
-          className="w-full bg-orange-500 hover:bg-orange-600 disabled:bg-orange-300 text-white font-bold py-4 rounded-xl text-lg"
-        >
+        {/* Place Order */}
+        <button onClick={handlePlaceOrder} disabled={loading}
+          style={{ width: '100%', padding: '15px', borderRadius: 14, border: 'none', cursor: loading ? 'not-allowed' : 'pointer', fontWeight: 700, fontSize: 15, color: '#fff',
+            background: loading ? '#9aab87' : 'linear-gradient(135deg, #d97706, #f59e0b)',
+            boxShadow: loading ? 'none' : '0 4px 16px #d9770645' }}>
           {loading ? '⏳ Placing Order...' : `✅ Confirm Order — ₹${total}`}
         </button>
       </div>
