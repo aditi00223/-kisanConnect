@@ -1,4 +1,4 @@
-Initial commit: Add KisanConnect README 
+feat: setup React with Tailwind CSS and i18next multilingual support 
  
 Co-authored-by: banthwanstuti <banthwanstuti@gmail.com> 
 Co-authored-by: harnoor6ninthbhvm <harnoor6ninthbhvm@gmail.com>
